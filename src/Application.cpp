@@ -2,9 +2,6 @@
 #include <glad/glad.h>
 #include <iostream>
 
-#include "Player.h"
-#include "Bot.h"
-
 Application* Application::_instance = nullptr;
 
 Application::Application()
@@ -41,15 +38,21 @@ void Application::Run()
 	// Initiate renderer
 	_renderer = std::make_unique<Renderer>();
 
+	// Initiate time class
+	_time = std::make_unique<Time>();
+
 	// Initiate projection matrix
-	_ortho = glm::ortho(0.0f, static_cast<float>(_window->GetWidth()), static_cast<float>(_window->GetHeight()), 0.0f, -1.0f, 1.0f);
+	_ortho = glm::ortho(0.0f, static_cast<float>(_window->GetWidth()), 0.0f, static_cast<float>(_window->GetHeight()), -1.0f, 1.0f);
 	_shader->SetUniform("uProj", _ortho);
 
 	// Create Player
-	Player player = Player();
+	_player = std::make_unique<Player>();
+
+	// Create Ball
+	_ball = std::make_unique<Ball>();
 
 	// Create Bot
-	Bot bot = Bot();
+	_bot = std::make_unique<Bot>();
 
 	// Game loop
 	while (_running)
@@ -57,15 +60,24 @@ void Application::Run()
 		// Pool window messages (treat)
 		_window->Update();
 
-		player.Update();
-		bot.Update();
+		// Update deltatime
+		_time->Update();
+
+		// Update game objects
+		_player->Update();
+		_ball->Update();
+		_bot->Update();
+
+		// Check if ball collides with anything
+		CheckCollisions();
 
 		// Clear window framebuffer
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Render must be here
-		_renderer->Render(player.mesh, player.transform, player.material, *_shader);
-		_renderer->Render(bot.mesh, bot.transform, bot.material, *_shader);
+		_renderer->Render(_player->mesh, _player->transform, _player->material, *_shader, GL_TRIANGLES);
+		_renderer->Render(_ball->mesh, _ball->transform, _ball->material, *_shader, GL_TRIANGLES);
+		_renderer->Render(_bot->mesh, _bot->transform, _bot->material, *_shader, GL_TRIANGLES);
 
 		// Present new framebuffer
 		_window->Present();
@@ -75,6 +87,10 @@ void Application::Run()
 void Application::Resize(int width, int height)
 {
 	glViewport(0, 0, width, height);
-	_ortho = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
+	_ortho = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 1.0f);
 	_shader->SetUniform("uProj", _ortho);
+}
+
+void Application::CheckCollisions()
+{
 }

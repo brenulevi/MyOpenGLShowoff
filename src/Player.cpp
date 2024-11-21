@@ -5,10 +5,6 @@
 
 Player::Player()
 {
-	transform.position = glm::vec3(12.5f, 300.0f, 0.0f);
-	transform.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-	transform.scale = glm::vec3(25.0f, 175.0f, 1.0f);
-
 	mesh.AddVertex(-0.5f, -0.5f, 0.0f);		// BL
 	mesh.AddVertex(-0.5f,  0.5f, 0.0f);		// TL
 	mesh.AddVertex( 0.5f,  0.5f, 0.0f);		// TR
@@ -18,6 +14,10 @@ Player::Player()
 	mesh.AddTriangle(2, 3, 0);				// TR BR BL
 
 	material.color = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
+
+	int wndWidth = Application::Get()->GetWindow().GetWidth();
+	int wndHeight = Application::Get()->GetWindow().GetHeight();
+	transform.position = glm::vec3(playerWidth / 2.0f, (wndHeight / 2.0f), 0.0f);
 }
 
 Player::~Player()
@@ -26,18 +26,32 @@ Player::~Player()
 
 void Player::Update()
 {
-	// TODO Time class and player movement
+	if (Input::GetKey(GLFW_KEY_ESCAPE))
+	{
+		Application::Get()->Close();
+	}
 
-	int wndWidth = Application::Get()->GetWindow().GetWidth();
 	int wndHeight = Application::Get()->GetWindow().GetHeight();
-	transform.position = glm::vec3(playerWidth / 2.0f, (wndHeight / 2.0f) + (movementOffset * wndHeight), 0.0f);
+	auto& time = Application::Get()->GetTime();
+
+	float playerHeight = playerHeightRatio * wndHeight;
+	transform.scale = glm::vec3(playerWidth, playerHeight, 0.0f);	// if window resize, update scale
 
 	if (Input::GetKey('W'))
 	{
-		//transform.position.y += playerSpeed * Time::deltaTime;
+		transform.position.y += playerSpeed * time.deltaTime;
 	}
 	if (Input::GetKey('S'))
 	{
-		//transform.position.y -= playerSpeed * Time::deltaTime;
+		transform.position.y -= playerSpeed * time.deltaTime;
+	}
+
+	if (transform.position.y >= (wndHeight - playerHeight / 2.0f))
+	{
+		transform.position.y = (wndHeight - playerHeight / 2.0f);
+	}
+	else if (transform.position.y <= playerHeight / 2.0f)
+	{
+		transform.position.y = playerHeight / 2.0f;
 	}
 }

@@ -8,7 +8,7 @@ Renderer::~Renderer()
 {
 }
 
-void Renderer::Render(Mesh& mesh, Transform& transform, Material& material, Shader& shader)
+void Renderer::Render(Mesh& mesh, Transform& transform, Material& material, Shader& shader, GLenum mode)
 {
 	glm::mat4 world = glm::mat4(1.0f);
 
@@ -22,7 +22,7 @@ void Renderer::Render(Mesh& mesh, Transform& transform, Material& material, Shad
 
 	shader.Bind();
 	mesh.SetupDraw();
-	glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, 0);
+	glDrawElements(mode, mesh.GetIndexCount(), GL_UNSIGNED_INT, 0);
 	mesh.RemoveDraw();
 	shader.Unbind();
 }

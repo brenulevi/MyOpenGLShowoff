@@ -18,8 +18,7 @@ public:
 	Material material;
 
 private:
-	int playerWidth = 25;
-	int playerHeight = 175;
-	float movementOffset = 0.0f;
-	float playerSpeed = 2.0f;
+	int playerWidth = 25;			// width of player collider and mesh
+	float playerHeightRatio = 0.25;		// percentage of screen height
+	float playerSpeed = 255.0f;		// player movement speed
 };

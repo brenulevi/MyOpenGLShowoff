@@ -16,6 +16,8 @@ Window::Window(int width, int height, const char* title)
 
 	glfwSetWindowUserPointer(_ptr, this);
 
+	glfwSwapInterval(0);
+
 	glfwSetWindowCloseCallback(_ptr, [](GLFWwindow* window) {
 			Application::Get()->Close();
 		}

@@ -11,5 +11,5 @@ public:
 	Renderer();
 	~Renderer();
 
-	void Render(Mesh& mesh, Transform& transform, Material& material, Shader& shader);
+	void Render(Mesh& mesh, Transform& transform, Material& material, Shader& shader, GLenum mode);
 };
