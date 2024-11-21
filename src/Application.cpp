@@ -2,14 +2,13 @@
 #include <glad/glad.h>
 #include <iostream>
 
-#include "Shader.h"
-#include "VertexBuffer.h"
-#include "VertexArray.h"
+#include "Player.h"
+#include "Bot.h"
 
 Application* Application::_instance = nullptr;
 
 Application::Application()
-	: _running{true}
+	: _running{ true }, _ortho{ 1.0f }
 {
 	if (_instance)
 	{
@@ -37,22 +36,20 @@ void Application::Run()
 	}
 
 	// Create simple shader
-	Shader shader = Shader("shaders/shader.vert", "shaders/shader.frag");
+	_shader = std::make_unique<Shader>("shaders/shader.vert", "shaders/shader.frag");
 
-	// Create a vertex buffer for a triangle
-	VertexBuffer vbo = VertexBuffer();
-	std::vector<Vertex> vertices = {
-		{ 0.0f,  0.5f, 0.0f},		// top
-		{-0.5f, -0.5f, 0.0f},		// left
-		{ 0.5f, -0.5f, 0.0f}		// right
-	};
-	// Add data to buffer
-	vbo.PushData(vertices);
+	// Initiate renderer
+	_renderer = std::make_unique<Renderer>();
 
-	// Create vertex array object
-	VertexArray vao = VertexArray();
-	// Add VBO to Vertex Array
-	vao.AddBuffer(vbo);
+	// Initiate projection matrix
+	_ortho = glm::ortho(0.0f, static_cast<float>(_window->GetWidth()), static_cast<float>(_window->GetHeight()), 0.0f, -1.0f, 1.0f);
+	_shader->SetUniform("uProj", _ortho);
+
+	// Create Player
+	Player player = Player();
+
+	// Create Bot
+	Bot bot = Bot();
 
 	// Game loop
 	while (_running)
@@ -60,15 +57,24 @@ void Application::Run()
 		// Pool window messages (treat)
 		_window->Update();
 
+		player.Update();
+		bot.Update();
+
 		// Clear window framebuffer
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Render must be here
-		shader.Bind();
-		vao.Bind();
-		glDrawArrays(GL_TRIANGLES, 0, vbo.GetVertexCount());
+		_renderer->Render(player.mesh, player.transform, player.material, *_shader);
+		_renderer->Render(bot.mesh, bot.transform, bot.material, *_shader);
 
 		// Present new framebuffer
 		_window->Present();
 	}
+}
+
+void Application::Resize(int width, int height)
+{
+	glViewport(0, 0, width, height);
+	_ortho = glm::ortho(0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, -1.0f, 1.0f);
+	_shader->SetUniform("uProj", _ortho);
 }

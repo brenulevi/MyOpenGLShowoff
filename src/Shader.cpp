@@ -57,8 +57,28 @@ void Shader::Unbind()
 	glUseProgram(0);
 }
 
-void Shader::SetUniform(const char* name, int value)
+void Shader::SetUniform(const char* name, const int value)
 {
+	Bind();
+	auto uniformLocation = GetUniformLocation(name);
+	glUniform1i(uniformLocation, value);
+	Unbind();
+}
+
+void Shader::SetUniform(const char* name, const glm::vec4& value)
+{
+	Bind();
+	auto uniformLocation = GetUniformLocation(name);
+	glUniform4fv(uniformLocation, 1, &value[0]);
+	Unbind();
+}
+
+void Shader::SetUniform(const char* name, const glm::mat4& value)
+{
+	Bind();
+	auto uniformLocation = GetUniformLocation(name);
+	glUniformMatrix4fv(uniformLocation, 1, GL_FALSE, &value[0][0]);
+	Unbind();
 }
 
 GLuint Shader::CreateShader(GLenum type, const char* path)
@@ -95,4 +115,19 @@ GLuint Shader::CreateShader(GLenum type, const char* path)
 	}
 
 	return shader;
+}
+
+GLint Shader::GetUniformLocation(const char* name)
+{
+	auto uniformIterator = _uniforms.find(name);
+
+	if (uniformIterator == _uniforms.end())
+	{
+		// Get uniform location via OpenGL call and add to uniform map
+		GLint uniform = glGetUniformLocation(_id, name);
+		_uniforms[name] = uniform;
+		return uniform;
+	}
+
+	return uniformIterator->second;
 }

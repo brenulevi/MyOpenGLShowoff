@@ -20,6 +20,16 @@ Window::Window(int width, int height, const char* title)
 			Application::Get()->Close();
 		}
 	);
+
+	glfwSetFramebufferSizeCallback(_ptr, [](GLFWwindow* window, int width, int height) {
+			auto wnd = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+
+			wnd->_width = width;
+			wnd->_height = height;
+
+			Application::Get()->Resize(width, height);
+		}
+	);
 }
 
 Window::~Window()

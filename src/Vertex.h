@@ -7,5 +7,5 @@ struct Vertex
 		float x, y, z;
 	} position;
 
-	Vertex(float x, float y, float z) : position{x, y, z} {}
+	Vertex(float x, float y, float z) : position{ x, y, z } {}
 };

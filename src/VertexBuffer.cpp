@@ -21,7 +21,7 @@ VertexBuffer::~VertexBuffer()
 
 void VertexBuffer::PushData(const std::vector<Vertex>& data)
 {
-	_vertexCount = data.size();
+	_vertexCount = static_cast<int>(data.size());
 
 	Bind();
 	glBufferData(GL_ARRAY_BUFFER, _vertexCount * _stride, data.data(), GL_STATIC_DRAW);

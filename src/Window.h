@@ -11,6 +11,10 @@ public:
 	void Update();
 	void Present();
 
+	inline GLFWwindow* GetPtr() const { return _ptr; }
+	inline int GetWidth() const { return _width; }
+	inline int GetHeight() const { return _height; }
+
 private:
 	GLFWwindow* _ptr;
 	int _width;
